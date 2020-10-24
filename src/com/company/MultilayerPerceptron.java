@@ -13,8 +13,8 @@ public class MultilayerPerceptron {
     public float[] VofHiddenLayers = new float[4];
     public float[] outputsOfHiddenLayers = new float[4];
     public float[] localGradientsOfHiddenLayer = new float[4];
-
-    float biasOfOutputLayer;
+    public float outputOfOutputLayer = 0;
+    public float biasOfOutputLayer;
 
 
 
@@ -90,36 +90,37 @@ public class MultilayerPerceptron {
 
 
 
-    float calculateOutput( float input ,float[] weightsOfInput,float   biasOfOutputLayer , float[] weightsOfHiddenLayer,float[] biasOfHiddenLayer , float desiredOutput){
-
-
-
-        float outputOfOutputLayer = 0;
-
+    float[] calculateOutputsOfHiddenLayer( float input ,float[] weightsOfInput , float[] biasOfHiddenLayer ){
         float error ;
-
         for (int i = 0; i <VofHiddenLayers.length; i++){
             VofHiddenLayers[i] = input * weightsOfInput[i] +  biasOfHiddenLayer[i];
-            outputsOfHiddenLayers[i] = (float) (1 / (1 + Math.exp(-VofHiddenLayers[i])));
-            outputOfOutputLayer += outputsOfHiddenLayers[i]* weightsOfHiddenLayer[i] + biasOfOutputLayer;
+            if(!Float.isNaN((float) Math.exp(-VofHiddenLayers[i]))){
+                outputsOfHiddenLayers[i] = (float) (1 / (1 + Math.exp(-VofHiddenLayers[i])));
 
+            } else {
+                System.out.println("Math.exp(-VofHiddenLayers[i]) = " + Math.exp(-VofHiddenLayers[i]));
+                System.out.println("VofHiddenLayers[i] = " + VofHiddenLayers[i]);
+            }
         }
-
-        error= desiredOutput - outputOfOutputLayer;
-
-
-
-       // System.out.println("error = " + error);
-
-
-        return  outputOfOutputLayer;
-
+        return  outputsOfHiddenLayers;
     }
 
 
 
+    float calculateOutput(float[] weightsOfHiddenLayer, float[] outputsOfHiddenLayers ,float   biasOfOutputLayer){
 
-    float[] updateOutputLayerWeights(float error, float learningRate){
+        for (int i = 0; i < outputsOfHiddenLayers.length; i++) {
+
+
+            outputOfOutputLayer += outputsOfHiddenLayers[i] * weightsOfHiddenLayer[i] + biasOfOutputLayer;
+        }
+
+        return outputOfOutputLayer;
+
+    }
+
+
+    float[] updateHiddenLayerWeights(float error, float learningRate){
 
         for (int i = 0; i < weightsOfHiddenLayer.length; i++){
             weightsOfHiddenLayer[i]+= weightsOfHiddenLayer[i] + learningRate*error*outputsOfHiddenLayers[i];
