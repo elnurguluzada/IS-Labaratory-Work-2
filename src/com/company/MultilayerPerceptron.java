@@ -4,14 +4,15 @@ public class MultilayerPerceptron {
 
 
 
-    float input =  0.14913F;
+    public float input =  0.14913F;
 
-    float[] weightsOfInputLayer = new float[4];
-    float   biasofInput;
-    float[] weightsOfHiddenLayer = new float[4];
-    float[] biasOfHiddenLayer = new float[4];
-    float[] VofHiddenLayers = new float[4];
-    float[] outputsOfHiddenLayers = new float[4];
+    public float[] weightsOfInputLayer = new float[4];
+    public float   biasofInput;
+    public float[] weightsOfHiddenLayer = new float[4];
+    public float[] biasOfHiddenLayer = new float[4];
+    public float[] VofHiddenLayers = new float[4];
+    public float[] outputsOfHiddenLayers = new float[4];
+    public float[] localGradientsOfHiddenLayer = new float[4];
 
     float biasOfOutputLayer;
 
@@ -118,13 +119,44 @@ public class MultilayerPerceptron {
 
 
 
-    void updateOutputLayer(float error, float learningRate){
-        
+    float[] updateOutputLayerWeights(float error, float learningRate){
+
         for (int i = 0; i < weightsOfHiddenLayer.length; i++){
             weightsOfHiddenLayer[i]+= weightsOfHiddenLayer[i] + learningRate*error*outputsOfHiddenLayers[i];
         }
-
+        return weightsOfHiddenLayer;
     }
 
+
+    float updateOutputLayerBias(float error, float learningRate){
+
+        biasOfOutputLayer+= biasOfOutputLayer + learningRate*error;
+
+      return biasOfOutputLayer;
+    }
+
+
+
+    float[] updateLocalGradientsOfHiddenLayer(float error , float[] updatedWeightsOfOutputLayer, float[] outputsOfHiddenLayers){
+
+        for (int i = 0; i < localGradientsOfHiddenLayer.length; i++){
+
+            localGradientsOfHiddenLayer[i] += outputsOfHiddenLayers[i]*(1-outputsOfHiddenLayers[i])*error*updatedWeightsOfOutputLayer[i];
+        }
+
+        return localGradientsOfHiddenLayer;
+    }
+
+
+    float[] updateInputParameters(float input , float[] weightsOfInputLayer ,float[] localGradientsOfHiddenLayer, float learningRate ){
+
+        for (int i = 0; i < weightsOfInputLayer.length; i++){
+
+            weightsOfInputLayer[i]+= weightsOfInputLayer[i] + learningRate * localGradientsOfHiddenLayer[i] * input;
+
+        }
+
+        return weightsOfInputLayer;
+    }
 
 }
